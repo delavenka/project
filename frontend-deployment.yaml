@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-frontend
+  template:
+    metadata:
+      labels:
+        app: todo-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: harbor.bilgem.tubitak.gov.tr/tmp/todo-frontend:latest # En son build edilen
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-app
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: todo-app
+data:
+  DB_HOST: "db-service" # Service adı
+  DB_NAME: "tododb"
+  DB_USER: "myuser"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+  namespace: todo-app
+type: Opaque
+data:
+  # Şifreler base64 formatında olmalı. 
+  # Terminalde 'echo -n mypassword | base64' komutuyla alabilirsin.
+  DB_PASS: bXlwYXNzd29yZA==

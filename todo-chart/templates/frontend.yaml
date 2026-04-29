@@ -1,0 +1,38 @@
+# 1. Deployment Bölümü
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.deploymentName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.appName }}
+    spec:
+      containers:
+      - name: frontend
+        image: {{ .Values.frontend.image }}
+        imagePullPolicy: {{ .Values.frontend.pullPolicy | default "Always" }}
+        ports:
+        - containerPort: {{ .Values.frontend.containerPort | default 80 }}
+---
+# 2. Service Bölümü
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.frontend.serviceName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  selector:
+    app: {{ .Values.frontend.appName }}
+  ports:
+  - port: {{ .Values.frontend.service.port }}
+    targetPort: {{ .Values.frontend.service.targetPort }}
+    nodePort: {{ .Values.frontend.service.nodePort }}
+    

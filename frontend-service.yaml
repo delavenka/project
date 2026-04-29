@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: todo-app
+spec:
+  type: NodePort # Dışarıdan erişim için
+  selector:
+    app: todo-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30001 # Tarayıcıdan http://SUNUCU_IP:30001 ile girilir.

@@ -1,0 +1,72 @@
+global:
+  namespace: todo-app
+  # ConfigMap ve Secret isimlerini globalde tutmak yönetimi kolaylaştırır
+  configMapName: db-config
+  secretName: db-secret
+
+frontend:
+  deploymentName: frontend-deployment
+  serviceName: frontend-service
+  appName: todo-frontend
+  replicaCount: 1
+  image: harbor.bilgem.tubitak.gov.tr/tmp/todo-frontend:latest
+  imagePullPolicy: Always
+  containerPort: 80
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 80
+    nodePort: 30001
+
+backend:
+  deploymentName: backend-deployment
+  serviceName: backend-service
+  appName: todo-backend
+  replicaCount: 1
+  image: harbor.bilgem.tubitak.gov.tr/tmp/todo-backend:latest
+  imagePullPolicy: Always
+  containerPort: 8080
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  # Backend'in DB'ye bağlanması için gereken host bilgisi
+  env:
+    dbHost: "db-service"
+
+db:
+  deploymentName: db-deployment
+  serviceName: db-service
+  appName: todo-db
+  replicaCount: 1
+  image: postgres:15
+  containerPort: 5432
+  service:
+    type: ClusterIP
+    port: 5432
+    targetPort: 5432
+  # Kalıcı depolama bilgileri
+  persistence:
+    pvName: postgres-pv
+    pvcName: postgres-pvc
+    mountPath: /var/lib/postgresql/data
+    storage: 1Gi
+    accessMode: ReadWriteOnce
+    hostPath: "/mnt/data"
+  # ConfigMap içindeki anahtarlar (Key'ler)
+  envKeys:
+    userKey: DB_USER
+    dbNameKey: DB_NAME
+    passKey: DB_PASS
+
+# Hocanın istediği: Configmap içeriği values'dan alınacak
+configData:
+  DB_USER: "myuser"
+  DB_NAME: "tododb"
+  DB_HOST: "db-service" # Backend bunu kullanacak
+
+# Secret verileri (Gerçekte buraya yazılmaz ama staj projesi için uygun)
+secretData:
+  DB_PASS: "mypassword"
+
+

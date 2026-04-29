@@ -1,0 +1,56 @@
+# 1. Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.global.namespace }}
+---
+# 2. ConfigMap (Dinamik İçerik)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.configMapName }}
+  namespace: {{ .Values.global.namespace }}
+data:
+{{- range $key, $value := .Values.configData }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+---
+# 3. Secret (Otomatik Base64 Dönüşümü)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.global.secretName }}
+  namespace: {{ .Values.global.namespace }}
+type: Opaque
+data:
+{{- range $key, $value := .Values.secretData }}
+  # Helm'in b64enc fonksiyonu sayesinde şifreyi values'a düz metin yazsan da 
+  # buraya base64 olarak basılır.
+  {{ $key }}: {{ $value | b64enc | quote }}
+{{- end }}
+---
+# 4. PersistentVolume (Cluster Genelinde)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.db.persistence.pvName | default "postgres-pv" }}
+spec:
+  capacity:
+    storage: {{ .Values.db.persistence.storage | default "1Gi" }}
+  accessModes:
+    - {{ .Values.db.persistence.accessMode | default "ReadWriteOnce" }}
+  hostPath:
+    path: {{ .Values.db.persistence.hostPath | quote }}
+---
+# 5. PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.db.persistence.pvcName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.db.persistence.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.db.persistence.storage | default "1Gi" }}

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.db.deploymentName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.db.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.db.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.db.appName }}
+    spec:
+      containers:
+      - name: postgres
+        image: {{ .Values.db.image }}
+        env:
+        - name: POSTGRES_USER
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Values.global.configMapName }}
+              key: {{ .Values.db.envKeys.userKey }}
+        - name: POSTGRES_DB
+          valueFrom: 
+            configMapKeyRef: 
+              name: {{ .Values.global.configMapName }}
+              key: {{ .Values.db.envKeys.dbNameKey }}
+        - name: POSTGRES_PASSWORD
+          valueFrom: 
+            secretKeyRef: 
+              name: {{ .Values.global.secretName }}
+              key: {{ .Values.db.envKeys.passKey }}
+        ports:
+        - containerPort: {{ .Values.db.containerPort }}
+        volumeMounts:
+        - name: db-storage
+          mountPath: {{ .Values.db.persistence.mountPath | quote }}
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.db.persistence.pvcName }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.db.serviceName }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    app: {{ .Values.db.appName }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.db.service.port }}
+      targetPort: {{ .Values.db.service.targetPort }}
+  type: {{ .Values.db.service.type }}
