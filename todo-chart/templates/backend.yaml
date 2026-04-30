@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: {{ .Values.backend.image }}
+        image: "{{ .Values.backend.image }}:{{ .Values.backend.imageTag }}"
         imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
         envFrom:
         - configMapRef: 
