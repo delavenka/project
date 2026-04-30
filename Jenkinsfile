@@ -31,16 +31,12 @@ spec:
 
     environment {
         HARBOR_REGISTRY = "harbor.bilgem.tubitak.gov.tr"
-        HARBOR_PROJECT  = "tmp"  // Sadece yetkimiz olan proje
-        IMAGE_TAG       = "latest"
+        HARBOR_PROJECT  = "tmp"
+        // IMAGE_TAG artık her build'de artan numara olacak (v1, v2, v3... gibi)
+        IMAGE_TAG       = "v${env.BUILD_NUMBER}"
     }
 
     stages {
-
-
-        // 'Create Harbor Config' stage'i tamamen SİLİNDİ.
-        // Çünkü secret mount edildiği an dosya hazır.
-
         stage('Build & Push Backend') {
             steps {
                 container('kaniko') {
