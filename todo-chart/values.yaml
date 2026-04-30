@@ -10,7 +10,7 @@ frontend:
   appName: todo-frontend
   replicaCount: 1
   image: harbor.bilgem.tubitak.gov.tr/tmp/todo-frontend
-  imageTag: latest
+  imageTag: v8
   imagePullPolicy: Always
   containerPort: 80
   service:
