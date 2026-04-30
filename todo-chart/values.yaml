@@ -24,7 +24,8 @@ backend:
   serviceName: backend-service
   appName: todo-backend
   replicaCount: 1
-  image: harbor.bilgem.tubitak.gov.tr/tmp/todo-backend:latest
+  image: harbor.bilgem.tubitak.gov.tr/tmp/todo-backend
+  imageTag: latest
   imagePullPolicy: Always
   containerPort: 8080
   service:
