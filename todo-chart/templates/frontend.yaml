@@ -20,6 +20,13 @@ spec:
         imagePullPolicy: {{ .Values.frontend.pullPolicy | default "Always" }}
         ports:
         - containerPort: {{ .Values.frontend.containerPort | default 80 }}
+        resources:
+          requests:
+            cpu: {{ .Values.frontend.cpuRequest | default "250m" }}
+            memory: {{ .Values.frontend.memoryRequest | default "128Mi" }}
+          limits:
+            cpu: {{ .Values.frontend.cpuLimits | default "500m" }}
+            memory: {{ .Values.frontend.memoryLimits | default "256Mi" }}
 ---
 # 2. Service Bölümü
 apiVersion: v1
