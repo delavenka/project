@@ -10,9 +10,13 @@ frontend:
   appName: todo-frontend
   replicaCount: 1
   image: harbor.bilgem.tubitak.gov.tr/tmp/todo-frontend
-  imageTag: v9
+  imageTag: latest
   imagePullPolicy: Always
   containerPort: 80
+  cpuRequest: "200m"
+  memoryRequest: "128Mi"
+  cpuLimits: "500m"
+  memoryLimits: "256Mi"
   service:
     type: NodePort
     port: 80
@@ -67,7 +71,7 @@ configData:
   DB_NAME: "tododb"
   DB_HOST: "db-service" # Backend bunu kullanacak
 
-# Secret verileri (Gerçekte buraya yazılmaz ama staj projesi için uygun)
+# Secret verileri
 secretData:
   DB_PASS: "mypassword"
 
