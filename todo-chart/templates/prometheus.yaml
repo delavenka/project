@@ -62,8 +62,8 @@ data:
       scrape_interval: 15s
 
     rule_files:
-      - "/etc/prometheus/alert-rules.yml"
-
+      - "/etc/prometheus/rules/alert-rules.yml"
+    
     alerting:
       alertmanagers:
       - static_configs:
