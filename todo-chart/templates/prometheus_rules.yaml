@@ -15,6 +15,6 @@ data:
             labels:
               severity: warning
             annotations:
-              summary: "Yüksek RAM KullanİMİ (%80+)"
+              summary: "Yüksek RAM Kullanimi (%80+)"
               # Başİna {{ "{{" }} ekleyerek Helm'i devre dişi birakiyoruz
               description: "Pod {{ "{{" }} $labels.pod {{ "}}" }} kapasitesinin %80'inden fazlasini kullaniyor."
