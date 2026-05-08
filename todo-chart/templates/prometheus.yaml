@@ -13,6 +13,7 @@ spec:
       labels:
         app: {{ .Values.prometheus.appName }}
     spec:
+      serviceAccountName: prometheus-sa
       containers:
       - name: prometheus
         image: "{{ .Values.prometheus.image }}:{{ .Values.prometheus.imageTag }}"
