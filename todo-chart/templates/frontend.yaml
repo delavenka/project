@@ -1,71 +1,49 @@
-# 1. Prometheus Deployment
+
+# 1. Deployment Bölümü
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.prometheus.deploymentName }}
+  name: {{ .Values.frontend.deploymentName }}
   namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     matchLabels:
-      app: {{ .Values.prometheus.appName }}
+      app: {{ .Values.frontend.appName }}
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "80" # veya 8080 (backend için)
+        prometheus.io/path: "/metrics "
       labels:
-        app: {{ .Values.prometheus.appName }}
+        app: {{ .Values.frontend.appName }}
     spec:
       containers:
-      - name: prometheus
-        image: prom/prometheus:latest  # Prometheus'un resmi Docker imajı kullanılıyor.
-        args:
-          - "--config.file=/etc/prometheus/prometheus.yml"  # ConfigMap ile sağlanan yapılandırma dosyası belirtiliyor.
+      - name: frontend
+        image: "{{ .Values.frontend.image }}:{{ .Values.frontend.imageTag }}"
+        imagePullPolicy: {{ .Values.frontend.pullPolicy | default "Always" }}
         ports:
-        - containerPort: 9090  # Prometheus web arayüzü için kullanılan port.
-        volumeMounts:
-          - name: config-volume
-            mountPath: /etc/prometheus  # ConfigMap içeriğinin bağlandığı dizin.
-      volumes:
-        - name: config-volume
-          configMap:
-            name: prometheus-config  # ConfigMap kullanılarak yapılandırma dosyası bağlanıyor.
+        - containerPort: {{ .Values.frontend.containerPort | default 80 }}
+        resources:
+          requests:
+            cpu: {{ .Values.frontend.cpuRequest | default "250m" }}
+            memory: {{ .Values.frontend.memoryRequest | default "128Mi" }}
+          limits:
+            cpu: {{ .Values.frontend.cpuLimits | default "500m" }}
+            memory: {{ .Values.frontend.memoryLimits | default "256Mi" }}
 ---
-# 2. Prometheus Service
+# 2. Service Bölümü
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.prometheus.serviceName }}
+  name: {{ .Values.frontend.serviceName }}
   namespace: {{ .Values.global.namespace }}
 spec:
-  type: {{ .Values.prometheus.service.type }}
+  type: {{ .Values.frontend.service.type }}
   selector:
-    app: {{ .Values.prometheus.appName }}
+    app: {{ .Values.frontend.appName }}
   ports:
-  - port: {{ .Values.prometheus.service.port }}
-    targetPort: {{ .Values.prometheus.service.targetPort }}
-    nodePort: {{ .Values.prometheus.service.nodePort }}
----
-# 3. Prometheus ConfigMap
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: prometheus-config
-  namespace: {{ .Values.global.namespace }}
-data:
-  prometheus.yml: |
-    global:
-      scrape_interval: 15s
+  - port: {{ .Values.frontend.service.port }}
+    targetPort: {{ .Values.frontend.service.targetPort }}
+    nodePort: {{ .Values.frontend.service.nodePort }}
 
-    scrape_configs:
-      - job_name: 'prometheus'
-        static_configs:
-          - targets: ['localhost:9090']
-
-      # POD'larin RAM/CPU verisini tutan asil yer burasidir (cAdvisor)
-      - job_name: 'kubernetes-cadvisor'
-        scheme: https
-        metrics_path: /metrics/cadvisor
-        tls_config:
-          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-          insecure_skip_verify: true
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        kubernetes_sd_configs:
-          - role: node
