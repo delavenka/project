@@ -27,13 +27,13 @@ spec:
           - name: rules-volume
             mountPath: /etc/prometheus/alert-rules.yml
             subPath: alert-rules.yml
-      volumes:
-        - name: config-volume
-          configMap:
-            name: prometheus-config
-        - name: rules-volume
-          configMap:
-            name: prometheus-rules
+      volumeMounts:
+          - name: config-volume
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+          - name: rules-volume
+            mountPath: /etc/prometheus/alert-rules.yml
+            subPath: alert-rules.yml
 ---
 # 2. Prometheus Service (Aynı Kaldı)
 apiVersion: v1
