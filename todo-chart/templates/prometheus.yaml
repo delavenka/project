@@ -1,4 +1,4 @@
-# 1. Deployment Bölümü
+# 1. Prometheus Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,15 +19,15 @@ spec:
         imagePullPolicy: {{ .Values.prometheus.pullPolicy | default "Always" }}
         volumeMounts:
           - name: config-volume
-            mountPath: /etc/prometheus/    # ConfigMap buraya bir dosya olarak inecek
+            mountPath: /etc/prometheus/
         ports:
-        - containerPort: {{ .Values.prometheus.containerPort | default 80 }}
+        - containerPort: 9090
       volumes:
       - name: config-volume
         configMap:
-          name: prometheus-config   # Yukarıda oluşturduğumuz ConfigMap adı
+          name: prometheus-config
 ---
-# 2. Service Bölümü
+# 2. Prometheus Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -41,4 +41,20 @@ spec:
   - port: {{ .Values.prometheus.service.port }}
     targetPort: {{ .Values.prometheus.service.targetPort }}
     nodePort: {{ .Values.prometheus.service.nodePort }}
-    
+---
+# 3. Prometheus ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: {{ .Values.global.namespace }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+
+    scrape_configs:
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+       

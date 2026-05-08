@@ -54,3 +54,4 @@ spec:
   resources:
     requests:
       storage: {{ .Values.db.persistence.storage | default "1Gi" }}
+
