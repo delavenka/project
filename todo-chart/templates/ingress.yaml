@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: todo-ingress
-  namespace: todo-app
+  namespace: tmp
 spec:
   ingressClassName: nginx   # Ingress Controller: nginx
   rules:
