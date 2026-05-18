@@ -6,8 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx   # Ingress Controller: nginx
   rules:
-  - host: todo-idilsu.bilgem.gov.tr
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
